@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 let tabs = [
   { id: 'world', label: 'World' },

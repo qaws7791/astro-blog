@@ -1,32 +1,33 @@
 ---
-import Header from '../components/Header.astro'
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts'
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 interface Props {
-  title: string
-  description?: string
-  image?: string
+  title: string;
+  description?: string;
+  image?: string;
 }
 
 const {
   title,
-  description = 'Astro Blog',
-  image = '/images/default.webp',
-} = Astro.props
+  description = "Astro Blog",
+  image = "/images/default.webp",
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang='ko'>
+<html lang="ko">
   <head>
-    <meta charset='UTF-8' />
-    <meta name='description' content={description} />
-    <meta name='viewport' content='width=device-width' />
-    <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
-    <meta name='generator' content={Astro.generator} />
-    <meta property='og:image' content={image} />
-    <title>{title}</title>
+    <BaseHead
+      title={`${title} - ${SITE_TITLE}`}
+      description={description}
+      image={image}
+    />
   </head>
-  <body class='min-h-screen bg-neutral-50'>
+  <body class="min-h-screen bg-neutral-50">
     <Header title={SITE_TITLE} description={SITE_DESCRIPTION} />
     <slot />
+    <Footer />
   </body>
 </html>

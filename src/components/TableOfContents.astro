@@ -1,0 +1,120 @@
+---
+import type { MarkdownHeading } from 'astro'
+import TableOfContentsHeading from './TableOfContentsHeading.astro'
+
+interface Props {
+  headings: MarkdownHeading[]
+  class?: string
+}
+
+const { headings, class: className } = Astro.props
+
+const filteredHeadings = filterHeadings(headings)
+const toc = buildToc(filteredHeadings)
+
+export interface TOCHeadingType {
+  depth: number
+  slug: string
+  text: string
+  children: TOCHeadingType[]
+}
+
+function filterHeadings(headings: MarkdownHeading[], maxVisibleDepth = 3) {
+  return headings.filter((heading) => heading.depth <= maxVisibleDepth)
+}
+
+function buildToc(headings: MarkdownHeading[]) {
+  const stack: TOCHeadingType[] = []
+  const root: TOCHeadingType = { depth: 0, slug: '', text: '', children: [] }
+  let current = root
+
+  for (const heading of headings) {
+    const node = { ...heading, children: [] }
+
+    while (stack.length > 0 && stack[stack.length - 1].depth >= node.depth) {
+      stack.pop()
+    }
+
+    if (stack.length === 0) {
+      current.children.push(node)
+    } else {
+      stack[stack.length - 1].children.push(node)
+    }
+
+    stack.push(node)
+  }
+
+  return root.children
+}
+---
+
+<nav class={`pt-12 ${className}`}>
+  <ul>
+    {toc.map((heading) => <TableOfContentsHeading heading={heading} />)}
+  </ul>
+</nav>
+<script>
+  const headings = document.querySelectorAll(
+    'div.prose h1, div.prose h2, div.prose h3'
+  )
+
+  const asideItems = document.querySelectorAll('aside a')
+
+  let headingState = [...headings].map((heading) => {
+    return {
+      id: heading.id,
+      visible: false,
+    }
+  })
+
+  const changeActive = (id: string, visible: boolean) => {
+    headingState = headingState.map((heading) => {
+      if (heading.id === id) {
+        return {
+          id: heading.id,
+          visible,
+        }
+      }
+      return heading
+    })
+
+    let index = headingState.findIndex((heading) => heading.visible)
+    if (index === -1) {
+      if (headings[headings.length - 1].getBoundingClientRect().top < 0) {
+        index = headings.length - 1
+      }
+    } else if (index > 0) {
+      index -= 1
+    }
+
+    asideItems.forEach((item, i) => {
+      if (i === index - 1) {
+        item.classList.remove('text-neutral-300')
+      } else {
+        item.classList.add('text-neutral-300')
+      }
+    })
+  }
+
+  const fnObserver = () => {
+    function handleIntersection(entries: IntersectionObserverEntry[]) {
+      entries.forEach((entry) => {
+        changeActive(entry.target.id, entry.isIntersecting)
+      })
+    }
+
+    const options = {
+      root: null,
+      rootMargin: ' -60px 0px 0% 0px ',
+      threshold: 0,
+    }
+
+    const observer = new IntersectionObserver(handleIntersection, options)
+
+    headings.forEach((heading) => {
+      observer.observe(heading)
+    })
+  }
+  fnObserver()
+  document.addEventListener('astro:after-swap', fnObserver)
+</script>

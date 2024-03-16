@@ -1,36 +1,33 @@
 ---
-import BaseHead from '../components/BaseHead.astro'
-import Header from '../components/Header.astro'
-import Footer from '../components/Footer.astro'
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
-import { getCollection } from 'astro:content'
-import FormattedDate from '../components/FormattedDate.astro'
-import Layout from '../layouts/Layout.astro'
-const posts = (await getCollection('blog')).sort(
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+const posts = (await getCollection("blog")).sort(
   (a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf()
-)
+);
 ---
 
-<Layout
-  title='Blog'
-  description='Thoughts, ideas, and other musings from the mind of a web developer.'
->
-  <main class='max-w-screen-lg mx-auto pt-12 px-8'>
-    <h1 class='text-4xl font-bold mb-8'>Examples</h1>
+<Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <main class="max-w-screen-lg mx-auto p-8">
+    <h1 class="text-3xl mb-8 font-medium">Posts</h1>
     <section>
-      <ul class='grid grid-cols-1 md:grid-cols-3 gap-4'>
+      <ul class="grid grid-cols-1 md:grid-cols-3 gap-y-8 gap-x-4">
         {
           posts.map((post) => (
-            <li class='hover:scale-105 duration-300 ease-in-out'>
+            <li class="group">
               <a href={`/blog/${post.slug}/`}>
-                <img
+                <Image
                   width={720}
                   height={360}
                   src={post.data.heroImage}
-                  alt=''
-                  class='rounded-lg'
+                  alt=""
+                  class="rounded-lg group-hover:scale-105 duration-300 ease-in-out"
+                  transition:name={`image-${post.id}`}
                 />
-                <h4 class='font-bold'>{post.data.title}</h4>
+                <h2 class="font-bold mt-1 group-hover:text-violet-600">
+                  {post.data.title}
+                </h2>
               </a>
             </li>
           ))

@@ -1,0 +1,182 @@
+---
+title: 'Framer Motion 기초'
+description: 'Framer Motion 기초에 대해 알아봅니다'
+pubDate: 'Mar 17 2024'
+heroImage: '/blog-placeholder-1.jpg'
+---
+import ComponentPreview from '../../components/motion/ComponentPreview';
+
+## Framer Motion이란?
+
+Framer Motion은 React에서 애니메이션을 만들기 위한 모션 라이브러리입니다.
+Framer 웹 빌더와 함께 사용하면 더욱 강력한 기능을 발휘합니다.
+
+### Framer Motion 설치
+```bash
+npm install framer-motion
+```
+
+### 기본 사용법
+Framer Motion에서 애니메이션을 적용하려면 `<motion/>` 컴포넌트를 사용해야 합니다.
+사용법은 일반적인 HTML 태그와 동일합니다.
+```jsx
+import { motion } from 'framer-motion';
+<motion.div/>
+```
+
+### 애니메이션
+Framer Motion에서는 애니메이션을 적용하기 위해 `animate` 속성을 사용합니다. 
+<br/>animate에 값을 넣으면 Framer motion은 해당 값에 대한 애니메이션을 적용합니다.
+
+<ComponentPreview name="circle" title="서서히 나타나는 원" client:load/>
+
+```jsx
+import { motion } from "framer-motion";
+
+export default function Circle() {
+  return (
+    <motion.div
+      className="w-20 h-20 rounded-full bg-green-500"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 2 }}
+    />
+  );
+}
+```
+
+### 제스처
+Framer Motion은 기본 이벤트 리스너를 확장하여 제스처를 기능을 사용할 수 있습니다
+<br/> Hover, Tap, Pan, Drag, InView에 대한 동작 감지를 지원합니다.
+
+<ComponentPreview name="whileExample" title="While 테스트" client:load/>
+```jsx
+import { motion } from "framer-motion";
+export default function WhileExample() {
+  return (
+    <motion.button
+      className="w-20 h-20 bg-green-500"
+      drag
+      initial={{ rotate: 90 }}
+      whileDrag={{ scale: 1.2 }}
+      whileFocus={{ scale: 1.2 }}
+      whileHover={{ borderRadius: "100%" }}
+      whileTap={{ scale: 0.8 }}
+      whileInView={{ rotate: 0 }}
+    >
+      버튼
+    </motion.button>
+  );
+}
+```
+
+### Variants
+Variants는 애니메이션을 사전 정의한 세트입니다. 
+<br/>여러 개의 애니메이션을 한 번에 적용할 수 있고, 재사용이 가능합니다.
+
+<ComponentPreview name="variantsExample" title="Variants 예제" client:load/>
+
+```jsx
+import { motion, type Variants } from "framer-motion";
+
+const variants: Variants = {
+  onHover: {
+    scale: 1.2,
+  },
+  base: {
+    scale: 1,
+  },
+};
+export default function VariantsExample() {
+  return (
+    <motion.div
+      className="w-20 h-20 rounded-full bg-green-500"
+      initial="base"
+      whileHover="onHover"
+      variants={variants}
+    />
+  );
+}
+```
+
+### 스크롤 애니메이션
+Framer Motion은 뷰포트를 감지하여 스크롤 애니메이션을 적용할 수 있습니다.
+
+<ComponentPreview name="scrollTriggeredAnimation" title="스크롤 애니메이션 예제" client:load/>
+```jsx
+import { motion } from "framer-motion";
+export default function ScrollTriggeredAnimation() {
+  return (
+    <motion.div
+      className="w-20 h-20 bg-green-500"
+      initial={{ opacity: 0, y: 200 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1.5, type: "spring" }}
+    />
+  );
+}
+```
+
+### MotionValue
+기본적으로 motion 컴포넌트 내부에서는 애니메이션의 상태를 관리하는 MotionValue를 사용합니다.
+<br/> 하지만 이를 수동으로 사용하여 커스텀 애니메이션을 만들 수도 있습니다.
+`useMotionValue` 훅을 사용하여 MotionValue를 생성하고, `useTransform` 훅을 사용하여 MotionValue를 변환할 수 있습니다.
+
+<ComponentPreview name="motionValueExample" title="MotionValue 예제" client:load/>
+
+```jsx
+import { motion, useMotionValue, useTransform } from "framer-motion";
+
+export default function MotionValueExample() {
+  const x = useMotionValue(0);
+  const backgroundColor = useTransform(
+    x,
+    [-100, 0, 100],
+    ["#cee520", "#1fdf7f", "#1fdee8"]
+  );
+
+  return (
+    <motion.div
+      className="w-20 h-20"
+      dragConstraints={{ left: -100, right: 100 }}
+      drag="x"
+      style={{ x, backgroundColor }}
+    />
+  );
+}
+```
+
+### 레이아웃 애니메이션
+레이아웃 변경 비용을 최소화하기 위해 레이아웃 애니메이션을 사용할 수 있습니다.
+Framer Motion은 자체적인 변환을 통해 레이아웃 간 애니메이션을 적용합니다.
+`layout` 속성을 사용하여 레이아웃 애니메이션을 적용할 수 있습니다.
+<ComponentPreview name="layoutAnimationExample" title="레이아웃 애니메이션 예제" client:load/>
+
+```jsx
+import { motion } from "framer-motion";
+import { useState } from "react";
+
+export default function LayoutAnimationExample() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="flex gap-4">
+      <motion.div
+        className="w-20 h-20 text-center bg-blue-500 data-[open=true]:bg-red-500 data-[open=true]:w-32 data-[open=true]:h-32"
+        data-open={isOpen}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        No Layout
+      </motion.div>
+      <motion.div
+        className="w-20 h-20 text-center bg-blue-500 data-[open=true]:bg-red-500 data-[open=true]:w-32 data-[open=true]:h-32"
+        data-open={isOpen}
+        layout
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        Layout
+      </motion.div>
+    </div>
+  );
+}
+```
