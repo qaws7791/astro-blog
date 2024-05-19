@@ -31,4 +31,7 @@ export const Registry: RegistryType = {
   layoutAnimationExample: {
     component: React.lazy(() => import("./motion/LayoutAnimationExample")),
   },
+  draggableList: {
+    component: React.lazy(() => import("./motion/DraggableList")),
+  },
 };

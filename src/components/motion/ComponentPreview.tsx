@@ -22,7 +22,7 @@ export default function ComponentPreview({
   return (
     <div
       data-component={name}
-      className="border border-neutral-300 h-96 w-full bg-white rounded-lg relative flex flex-col shadow-md overflow-hidden"
+      className="border border-neutral-300 h-96 w-full bg-white rounded-lg relative flex flex-col shadow-md overflow-scroll"
     >
       <div className="py-2 px-3 border-b border-neutral-300 flex justify-between items-center">
         <p className="m-0 font-bold text-neutral-500">{title}</p>
